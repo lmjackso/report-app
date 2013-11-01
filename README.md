@@ -8,3 +8,6 @@ Tasks:
   - Compile templates
   - Implement forms
   - Deploy to EC2
+  - Set up SMTP server
+  - Implement export
+  - Implement export with camel
