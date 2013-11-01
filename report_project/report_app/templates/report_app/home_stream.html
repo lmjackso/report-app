@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% extends "grumblr_app/base_template.html" %}
+  {% block header %}
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stream of your profile and your own grumbles.">
+    <meta name="author" content="Lawrence Jackson">
+    <link rel="shortcut icon" href="../../assets/ico/favicon.png">
+
+    <title>Home Stream.</title>
+    <!-- Bootstrap core CSS -->
+    <link href="/static/assets/css/bootstrap.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/static/assets/css/navbar.css" rel="stylesheet">
+    <link href="/static/assets/css/searchbar.css" rel="stylesheet">
+    <link href="/static/assets/css/signin.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="../../assets/js/html5shiv.js"></script>
+    <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  {% endblock header %}
+  {% block body %}
+      <div class="row">
+        <div class="col-sm-8 col-md-4">
+        </div>
+        <div class="col-sm-8 col-md-4">
+          <div class="thumbnail">
+          <br></br>
+          <img style="width: 300px; height: 200px;" data-src="holder.js/300x200" alt="{{name}}" src="{% url 'photo' user.id%}">
+            <div class="caption">
+              <div class="text-center"><h3>{{name}}</h3></div>
+              <div class="text-center"><h4>{{location}}</h4></div>
+              <form action="/home-stream" enctype="multipart/form-data" method="post">
+              {% for field in form.visible_fields %}
+                {% ifequal field.field.widget.input_type "file" %}
+                <input type="{{field.field.widget.input_type}}" placeholder="{{field.label}}" name={{field.name}} id={{field.id}}>
+                {% else %}
+                <input type="{{field.field.widget.input_type}}" class="form-control" placeholder="Grumbl" name={{field.name}} id={{field.id}}>
+                {% endifequal %}
+              {% endfor %}
+                <br></br>
+                <p><button type="submit" class="btn btn-lg btn-primary btn-block">Grumble</button> </p>
+                {% csrf_token %}
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-8 col-md-4">
+        </div>
+      </div>
+
+
+
+      <br></br>
+      {% for post in posts %}
+      <div class="row">
+        <div class="panel panel-default">
+          <div class="panel-body">
+          <img style="width: 75px; height: 50px;" data-src="holder.js/300x200" alt="{{post}}" src="{% url 'grumblr-photo' post.id%}">
+          {{post}}
+          </div>
+          <div class="panel-footer">
+          {{post.timestamp}}
+            <div class="pull-right">
+              <form action="dislike_grumbl" method="POST">
+                {{post.dislikes}}
+                <input type="submit" value="Dislike"></input>
+                <input type="hidden" name="id" value={{post.id}}></input>
+                {% csrf_token %}
+              </form>
+            </div>
+          </div>
+          <br>
+          <ul class="list-group">
+          {% for comment in post.comments.all %}
+            <li class="list-group-item">
+          {{comment.text}}
+              <div class="pull-right">
+              Author:
+                <a href="view-profile.html?profile_name={{comment.user}}">{{comment.user.get_full_name}}</a>
+                {{comment.timestamp}}
+              </div>
+            </li>
+          </ul>
+          {% endfor %}
+        </div>
+        </div>
+      {% endfor %}
+    </div> <!-- /container -->
+    {% endblock body %}
+</html>

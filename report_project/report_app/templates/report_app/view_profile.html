@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% extends "grumblr_app/base_template.html" %}
+  {% block header %}
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stream of {{user}}.">
+    <meta name="author" content="Lawrence Jackson">
+    <link rel="shortcut icon" href="../../assets/ico/favicon.png">
+
+    <title>Home Stream.</title>
+    <!-- Bootstrap core CSS -->
+    <link href="/static/assets/css/bootstrap.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/static/assets/css/navbar.css" rel="stylesheet">
+    <link href="/static/assets/css/signin.css" rel="stylesheet">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/static/assets/js/comments.js" type="text/javascript"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="../../assets/js/html5shiv.js"></script>
+    <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  {% endblock header %}
+  {% block body %}
+      <div class="row">
+        <div class="col-sm-8 col-md-4">
+        </div>
+        <div class="col-sm-8 col-md-4">
+          <div class="thumbnail">
+          <br>
+          <img style="width: 300px; height: 200px;" data-src="holder.js/300x200" alt="{{subject.get_full_name}}" src="{% url 'photo' subject.id %}">
+            <div class="caption">
+              <div class="text-center"><h3>{{subject.get_full_name}}</h3></div>
+              <div class="text-center"><h4>{{location}}</h4></div>
+              <form method="post" action="/follow_user">
+                <p><input type="submit" class="btn btn-success btn-lg btn-primary btn-block" value="Follow"></input> </p>
+                <input type="hidden" name="id" value={{subject.id}}></input>
+                {% csrf_token %}
+              </form>
+              <form method="post" action="/block_user">
+                <p><input type="submit" class="btn btn-danger btn-lg btn-primary btn-block" value="Block User"></input> </p>
+                <input type="hidden" name="id" value={{subject.id}}></input>
+                {% csrf_token %}
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br></br>
+      {% for post in posts %}
+      <div class="row">
+        <div class="panel panel-default">
+          <div class="panel-body">
+          <img style="width: 75px; height: 50px;" data-src="holder.js/300x200" alt="{{post}}" src="{% url 'grumblr-photo' post.id%}">
+          {{post}}
+          </div>
+          <div class="panel-footer">
+          {{post.timestamp}}
+            <div class="pull-right">
+              <form action="dislike_grumbl" method="POST">
+                {{post.dislikes}}
+                <input type="submit" value="Dislike"></input>
+                <input type="hidden" name="id" value={{post.id}}></input>
+                {% csrf_token %}
+              </form>
+            </div>
+          </div>
+          <br>
+          <ul class="list-group" id="post{{post.id}}">
+          {% for comment in post.comments.all %}
+            <li class="list-group-item">
+          {{comment.text}}
+              <div class="pull-right">
+              Author:
+                <a href="view-profile.html?profile_name={{comment.user}}">{{comment.user.get_full_name}}</a>
+                {{comment.timestamp}}
+              </div>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+        <form action="" class="comment" method="post">
+          <input type="hidden" value={{post.id}} name="id" id="id">
+            <div class="col-sm-8 col-md-9">
+              <input type="text" class="form-control" id="comment" name="comment" placeholder="Leave a comment." autofocus></input>
+            </div>
+            <div class="col-sm-4 col-md-3">
+              <input type="submit" class="btn btn-primary btn-block pull-right" value="Comment"></input>
+            </div>
+            {% csrf_token %}
+          </form>
+        <br></br> <br></br>
+      </div>
+      {% endfor %}
+    </div> <!-- /container -->
+    {%endblock body %}
+</html>
